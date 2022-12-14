@@ -20,6 +20,9 @@ class RecFunSuite extends munit.FunSuite:
   test("balance: counting is not enough") {
     assert(!balance("())(".toList))
   }
+  test("balance: empty list") {
+    assert(balance("".toList))
+  }
 
   // ------ countChange tests -------------------------------------------------
 
@@ -51,6 +54,18 @@ class RecFunSuite extends munit.FunSuite:
 
   test("pascal: col=1,row=3") {
     assertEquals(pascal(1, 3), 3)
+  }
+  test("pascal: col=0,row=0") {
+    assertEquals(pascal(0, 0), 1)
+  }
+  test("pascal: col=-1,row=0") {
+    assertEquals(pascal(-1, 0), 0)
+  }
+  test("pascal: col=3,row=2") {
+    assertEquals(pascal(3, 2), 0)
+  }
+  test("pascal: col=2, row=2") {
+    assertEquals(pascal(2, 2), 1)
   }
 
   import scala.concurrent.duration.*
