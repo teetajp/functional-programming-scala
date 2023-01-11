@@ -44,7 +44,7 @@ class FunSetSuite extends munit.FunSuite:
    * Once you finish your implementation of "singletonSet", remove the
    * .ignore annotation.
    */
-  test("singleton set one contains one".ignore) {
+  test("singleton set one contains one") {
 
     /**
      * We create a new instance of the "TestSets" trait, this gives us access
@@ -66,7 +66,87 @@ class FunSetSuite extends munit.FunSuite:
       assert(!contains(s, 3), "Union 3")
   }
 
+  test("intersect contains all elements that are in both sets") {
+    new TestSets:
+      val s = intersect(s1, s1)
+      assert(contains(s, 1), "Intersect 1")
+  }
 
+  test("intersect does not contain elements that are not in both sets") {
+    new TestSets:
+      val s = intersect(s1, s2)
+      assert(!contains(s, 1), "Intersect 1")
+      assert(!contains(s, 2), "Intersect 2")
+  }
+
+  test("intersect - composite sets") {
+    new TestSets:
+      val s = intersect(intersect(s1, s2), s2) // inner intersect set is empty set
+      assert(!contains(s, 1), "Intersect 1")
+      assert(!contains(s, 2), "Intersect 2")
+  }
+
+  test("diff contains elements in first set only and no elements from second set") {
+    new TestSets:
+      val s = diff(s1, s2)
+      assert(contains(s, 1), "Diff 1")
+      assert(!contains(s, 2), "Diff 2")
+      assert(!contains(s, 3), "Diff 3")
+  }
+
+  test("diff of same sets is empty") {
+    new TestSets:
+      val s = diff(s1, s1)
+      assert(!contains(s, 1), "Diff 1")
+      assert(!contains(s, 2), "Diff 2")
+      assert(!contains(s, 3), "Diff 3")
+  }
+
+  test("Filter accepts all elements of the given set that is accepted by predicate p") {
+    new TestSets:
+      val u_123 = union(union(s1, s2), s3)
+
+      val include_all = filter(u_123, (x: Int) => true)
+      assert(!contains(include_all, 0), "Filter - Include All: 0 (not in set)")
+      assert(contains(include_all, 1), "Filter - Include All: 1")
+      assert(contains(include_all, 2), "Filter - Include All: 2")
+      assert(contains(include_all, 3), "Filter - Include All: 3")
+      assert(!contains(include_all, 4), "Filter - Include All: 4 (not in set)")
+      
+      val exclude_all = filter(u_123, (x: Int) => false)
+      assert(!contains(exclude_all, 0), "Filter - Exclude All: 0")
+      assert(!contains(exclude_all, 1), "Filter - Exclude All: 1")
+      assert(!contains(exclude_all, 2), "Filter - Exclude All: 2")
+      assert(!contains(exclude_all, 3), "Filter - Exclude All: 3")
+      assert(!contains(exclude_all, 4), "Filter - Exclude All: 4")
+
+      val geq_2 = filter(u_123, (x: Int) => x >= 2)
+      assert(!contains(geq_2, 0), "Filter - Greater or equal 2: 0 (not in set)")
+      assert(!contains(geq_2, 1), "Filter - Greater or equal 2: 1")
+      assert(contains(geq_2, 2), "Filter - Greater or equal 2: 2")
+      assert(contains(geq_2, 3), "Filter - Greater or equal 2: 3")
+      assert(!contains(geq_2, 4), "Filter - Greater or equal 2: 4 (not in set)")
+  }
+
+  test("forall returns true when predicate is true for all elements in the set") {
+    new TestSets:
+      val u_123 = union(union(s1, s2), s3)
+      
+      assert(forall(u_123, (x: Int) => true), "true for all of {1, 2, 3}")
+      assert(!forall(u_123, (x: Int) => false), "false for all of {1, 2, 3}")
+      assert(!forall(u_123, (x: Int) => x >= 2), "only accepts x >= 2, so should be false")
+  }
+
+    test("exists returns true when at least one of the element in the set is accepted by the predicate") {
+    new TestSets:
+      val u_123 = union(union(s1, s2), s3)
+      
+      assert(exists(u_123, (x: Int) => true), "true for all of {1, 2, 3}")
+      assert(!exists(u_123, (x: Int) => false), "false for all of {1, 2, 3}")
+      assert(exists(u_123, (x: Int) => x >= 2), "x >= 2 for {1, 2, 3}")
+      assert(exists(u_123, (x: Int) => x == 2), "x == 2 for {1, 2, 3}")
+      assert(!exists(u_123, (x: Int) => x == 4), "x == 4 for {1, 2, 3}, out of range")
+  }
 
   import scala.concurrent.duration.*
   override val munitTimeout = 10.seconds
