@@ -65,7 +65,7 @@ abstract class TweetSet extends TweetSetInterface:
    * Question: Should we implement this method here, or should it remain abstract
    * and be implemented in the subclasses?
    */
-  def mostRetweeted: Tweet = ???
+  def mostRetweeted: Tweet
 
   /**
    * Returns a list containing all tweets of this set, sorted by retweet count
@@ -76,7 +76,10 @@ abstract class TweetSet extends TweetSetInterface:
    * Question: Should we implement this method here, or should it remain abstract
    * and be implemented in the subclasses?
    */
-  def descendingByRetweet: TweetList = ???
+  def descendingByRetweet: TweetList =
+    descendingByRetweetAcc(Nil)
+
+  def descendingByRetweetAcc(acc: TweetList): TweetList
 
   /**
    * The following methods are already implemented
@@ -106,7 +109,7 @@ abstract class TweetSet extends TweetSetInterface:
   def foreach(f: Tweet => Unit): Unit
 
 class Empty extends TweetSet:
-  def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = acc;
+  def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = acc
 
   /**
    * The following methods are already implemented
@@ -119,6 +122,11 @@ class Empty extends TweetSet:
   def remove(tweet: Tweet): TweetSet = this
 
   def foreach(f: Tweet => Unit): Unit = ()
+
+  override def mostRetweeted: Tweet =
+    throw new java.util.NoSuchElementException("Empty TweetSet has no most retweeted tweet.")
+
+  override def descendingByRetweetAcc(acc: TweetList): TweetList = acc
 
 class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet:
 
@@ -158,6 +166,16 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet:
     left.foreach(f)
     right.foreach(f)
 
+  override def mostRetweeted: Tweet =
+    var mostPopularTweet = this.elem
+    foreach((t: Tweet) => {
+      if t.retweets >= mostPopularTweet.retweets then mostPopularTweet = t
+    })
+    mostPopularTweet
+
+  def descendingByRetweetAcc(acc: TweetList): TweetList =
+    val tweet_to_insert = mostRetweeted
+    Cons(mostRetweeted, remove(tweet_to_insert).descendingByRetweetAcc(acc))
 trait TweetList:
   def head: Tweet
   def tail: TweetList
