@@ -29,6 +29,10 @@ class HuffmanSuite extends munit.FunSuite:
     assertEquals(string2Chars("hello, world"), List('h', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd'))
   }
 
+  test("times correctly counts the number of characters") {
+    assertEquals( times( string2Chars("aa") ), List( ('a', 2)) )
+    assertEquals( times( string2Chars("aabc") ), List( ('a', 2), ('b', 1), ('c', 1) ) )
+  }
 
   test("make ordered leaf list for some frequency table (15pts)") {
     assertEquals(makeOrderedLeafList(List(('t', 2), ('e', 1), ('x', 3))), List(Leaf('e',1), Leaf('t',2), Leaf('x',3)))

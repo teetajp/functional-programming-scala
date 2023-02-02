@@ -1,5 +1,7 @@
 package patmat
 
+import scala.annotation.tailrec
+
 /**
  * A huffman code is represented by a binary tree.
  *
@@ -68,7 +70,29 @@ trait Huffman extends HuffmanInterface:
    *       println("integer is  : "+ theInt)
    *   }
    */
-  def times(chars: List[Char]): List[(Char, Int)] = ???
+  def times(chars: List[Char]): List[(Char, Int)] =
+    /* The number of characters is constant: there are 26 alphabets
+     * => use an accumulator
+     * => iterate over chars once - O(n)
+     * => for each char, match against existing tuple in the "dictionary" and increment the count - O(1) w/ const. chars
+     * O(n) total
+     * Implementation:
+     * - need some kind of for loop => use tail recursion and pattern matching, break chars down into x :: xs
+     * - use that x, which is a Char, and pattern match it with the dictionary list, and replace the tuple
+     *   - insert new tuple to end of list if not found
+     */
+    @tailrec
+    def timesAccumulator(charList: List[Char], accum: List[(Char, Int)]): List[(Char, Int)] = charList match
+      case Nil => accum
+      case x :: xs => timesAccumulator(xs, incrementCharCount(x, accum))
+
+    def incrementCharCount(char: Char, counts: List[(Char, Int)]): List[(Char, Int)] = counts match
+      case (charKey, currentCount) :: countsTail =>
+        if charKey == char then (charKey, currentCount + 1) :: countsTail
+        else (charKey, currentCount) :: incrementCharCount(char, countsTail)
+      case Nil => (char, 1) :: Nil
+
+    timesAccumulator(chars, Nil)
 
   /**
    * Returns a list of `Leaf` nodes for a given frequency table `freqs`.
