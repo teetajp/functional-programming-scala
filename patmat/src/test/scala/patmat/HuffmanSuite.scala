@@ -8,13 +8,18 @@ class HuffmanSuite extends munit.FunSuite:
     val t2 = Fork(Fork(Leaf('a',2), Leaf('b',3), List('a','b'), 5), Leaf('d',4), List('a','b','d'), 9)
   }
 
+  test("weight of a leaf") {
+    assertEquals(weight(Leaf('x', 6)), 6)
+  }
 
   test("weight of a larger tree (10pts)") {
     new TestTrees:
       assertEquals(weight(t1), 5)
   }
 
-
+  test("char of a leaf") {
+    assertEquals(chars(Leaf('b', 3)), List('b'))
+  }
   test("chars of a larger tree (10pts)") {
     new TestTrees:
       assertEquals(chars(t2), List('a','b','d'))
