@@ -249,7 +249,9 @@ trait Huffman extends HuffmanInterface:
    * This function returns the bit sequence that represents the character `char` in
    * the code table `table`.
    */
-  def codeBits(table: CodeTable)(char: Char): List[Bit] = ???
+  def codeBits(table: CodeTable)(char: Char): List[Bit] = table match
+    case Nil => throw Error(s"Character $char doesn't exist in the table")
+    case (charKey, charBits) :: cs => if charKey == char then charBits else codeBits(cs)(char)
 
   /**
    * Given a code tree, create a code table which contains, for every character in the
@@ -259,14 +261,28 @@ trait Huffman extends HuffmanInterface:
    * a valid code tree that can be represented as a code table. Using the code tables of the
    * sub-trees, think of how to build the code table for the entire tree.
    */
-  def convert(tree: CodeTree): CodeTable = ???
+  def convert(tree: CodeTree): CodeTable =
+    /* break it down into prefix (current, traversed path) and suffix (unexplored branch)
+     *  like a Prefix Tree / Trie
+     * we need to traverse the whole tree and return the path for each leaf node, and return to previous level and remove the suffix
+     * Perform "DFS"
+     * ----
+     * We recurse from the top, at each fork:
+     * - generate a CodeTable with all from all the charList
+     * - check left/right branch, if its a fork, then
+     */
+    def traverseTree(subtree: CodeTree, path: List[Bit]): CodeTable = subtree match
+      case Leaf(char, _) => List((char, path))
+      case Fork(left, right, _, _) => mergeCodeTables(traverseTree(left, path ::: List(0)), traverseTree(right, path ::: List(1)))
+
+    traverseTree(tree, Nil)
 
   /**
    * This function takes two code tables and merges them into one. Depending on how you
    * use it in the `convert` method above, this merge method might also do some transformations
    * on the two parameter code tables.
    */
-  def mergeCodeTables(a: CodeTable, b: CodeTable): CodeTable = ???
+  def mergeCodeTables(a: CodeTable, b: CodeTable): CodeTable = a ::: b
 
   /**
    * This function encodes `text` according to the code tree `tree`.
@@ -274,6 +290,11 @@ trait Huffman extends HuffmanInterface:
    * To speed up the encoding process, it first converts the code tree to a code table
    * and then uses it to perform the actual encoding.
    */
-  def quickEncode(tree: CodeTree)(text: List[Char]): List[Bit] = ???
+  def quickEncode(tree: CodeTree)(text: List[Char]): List[Bit] =
+    def encodeRecursive(textToEncode: List[Char]): List[Bit] = textToEncode match
+      case c :: cs => codeBits(convert(tree))(c) ::: encodeRecursive(cs)
+      case Nil => Nil
+
+    encodeRecursive(text)
 
 object Huffman extends Huffman
