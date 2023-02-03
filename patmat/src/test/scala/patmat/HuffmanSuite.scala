@@ -56,6 +56,11 @@ class HuffmanSuite extends munit.FunSuite:
     assertEquals(combine(leaflist), List(Fork(Leaf('e',1),Leaf('t',2),List('e', 't'),3), Leaf('x',4)))
   }
 
+  test("until calls the two functions until the list contains only a single tree") {
+    val leaflist = List(Leaf('e', 1), Leaf('t', 2), Leaf('x', 4))
+    var newList = until(singleton, combine)(leaflist)
+    assert(singleton(newList))
+  }
 
   test("decode and encode a very short text should be identity (10pts)") {
     new TestTrees:
