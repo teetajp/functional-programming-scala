@@ -38,6 +38,18 @@ class HuffmanSuite extends munit.FunSuite:
     assertEquals(makeOrderedLeafList(List(('t', 2), ('e', 1), ('x', 3))), List(Leaf('e',1), Leaf('t',2), Leaf('x',3)))
   }
 
+  test("singleton: checks whether the list contains only one single code tree") {
+    assert(singleton(List(makeCodeTree(Leaf('x', 1), Leaf('e', 1)))))
+    assert(singleton(List(makeCodeTree(
+      makeCodeTree(Leaf('x', 1), Leaf('e', 1)),
+      Leaf('t', 2)
+    ))))
+    assert(!singleton(Nil))
+    assert(!singleton(List(makeCodeTree(
+      makeCodeTree(Leaf('x', 1), Leaf('e', 1)),
+      Leaf('t', 2)
+    ), makeCodeTree(Leaf('x', 1), Leaf('e', 1)))))
+  }
 
   test("combine of some leaf list (15pts)") {
     val leaflist = List(Leaf('e', 1), Leaf('t', 2), Leaf('x', 4))
