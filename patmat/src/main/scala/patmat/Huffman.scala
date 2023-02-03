@@ -101,7 +101,22 @@ trait Huffman extends HuffmanInterface:
    * head of the list should have the smallest weight), where the weight
    * of a leaf is the frequency of the character.
    */
-  def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = ???
+  def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] =
+    // Construct a new list of leaves, and pattern match.
+    // Insert before the next one if current freq is smaller, else insert after
+    // If reach end of list, then just create it
+    @tailrec
+    def makeLeafList(freqsLeft: List[(Char, Int)], accum: List[Leaf]): List[Leaf] = freqsLeft match
+      case Nil => accum
+      case (charKey, charFreq) :: freqsTail => makeLeafList(freqsTail, insertLeaf(charKey, charFreq, accum))
+
+    def insertLeaf(char: Char, freq: Int, orderedLeaves: List[Leaf]): List[Leaf] = orderedLeaves match
+      case Nil => Leaf(char, freq) :: Nil
+      case Leaf(leafChar, leafFreq) :: leavesTail =>
+        if freq <= leafFreq then Leaf(char, freq) :: Leaf(leafChar, leafFreq) :: leavesTail
+        else Leaf(leafChar, leafFreq) :: insertLeaf(char, freq, leavesTail)
+
+    makeLeafList(freqs, Nil)
 
   /**
    * Checks whether the list `trees` contains only one single code tree.
