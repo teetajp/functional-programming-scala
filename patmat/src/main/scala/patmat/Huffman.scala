@@ -173,7 +173,17 @@ trait Huffman extends HuffmanInterface:
    * This function decodes the bit sequence `bits` using the code tree `tree` and returns
    * the resulting list of characters.
    */
-  def decode(tree: CodeTree, bits: List[Bit]): List[Char] = ???
+  def decode(tree: CodeTree, bits: List[Bit]): List[Char] =
+
+    def decodeAccumulator(subtree: CodeTree, remainingBits: List[Bit], accum: List[Char]): List[Char] = subtree match
+      case Leaf(char, _) => decodeAccumulator(tree, remainingBits, accum ::: List(char))
+      case Fork(left, right, _, _) => remainingBits match
+        case Nil => accum
+        case bit :: bitsTail =>
+          if bit == 0 then decodeAccumulator(left, bitsTail, accum)
+          else decodeAccumulator(right, bitsTail, accum)
+
+    decodeAccumulator(tree, bits, Nil)
 
   /**
    * A Huffman coding tree for the French language.
