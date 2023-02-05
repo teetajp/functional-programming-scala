@@ -35,7 +35,9 @@ object Anagrams extends AnagramsInterface:
    *
    *  Note: you must use `groupBy` to implement this method!
    */
-  def wordOccurrences(w: Word): Occurrences = ???
+  def wordOccurrences(w: Word): Occurrences =
+    val chars = w.toLowerCase.toList.groupBy((char: Char) => char)
+    chars.map((char, charList) => (char, charList.length)).toList.sortBy((char, freq) => char)
 
   /** Converts a sentence into its character occurrence list. */
   def sentenceOccurrences(s: Sentence): Occurrences = ???
@@ -133,8 +135,8 @@ object Anagrams extends AnagramsInterface:
    *
    *  Note: in case that the words of the sentence are in the dictionary, then the sentence is the anagram of itself,
    *  so it has to be returned in this list.
-   *
-   *  Note: There is only one anagram of an empty sentence.
+    *
+    *  Note: There is only one anagram of an empty sentence.
    */
   def sentenceAnagrams(sentence: Sentence): List[Sentence] = ???
 
