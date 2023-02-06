@@ -1,6 +1,7 @@
 package forcomp
 
-import scala.io.{ Codec, Source }
+import scala.io.{Codec, Source}
+import scala.runtime.Nothing$
 
 object Anagrams extends AnagramsInterface:
 
@@ -106,7 +107,16 @@ object Anagrams extends AnagramsInterface:
    * Note: the resulting value is an occurrence - meaning it is sorted
    * and has no zero-entries.
    */
-  def subtract(x: Occurrences, y: Occurrences): Occurrences = ???
+  def subtract(x: Occurrences, y: Occurrences): Occurrences =
+    y.foldLeft(x.toMap) { (newX, yCharFreq) =>
+      yCharFreq match {
+        case (yChar, yFreq) => newX.get(yChar) match
+          case Some(xFreq) => if xFreq - yFreq < 1 then newX - yChar else newX updated (yChar, xFreq - yFreq)
+          case None => newX
+      }
+    }.toList
+
+
 
   /** Returns a list of all anagram sentences of the given sentence.
    *
