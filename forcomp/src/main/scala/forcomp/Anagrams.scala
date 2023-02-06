@@ -158,7 +158,19 @@ object Anagrams extends AnagramsInterface:
    *
    * Note: There is only one anagram of an empty sentence.
    */
-  def sentenceAnagrams(sentence: Sentence): List[Sentence] = ???
+  def sentenceAnagrams(sentence: Sentence): List[Sentence] =
+    def sentenceAnagramsRecursive(occ: Occurrences): List[Sentence] = occ match
+      case Nil => List(Nil)
+      case _ =>
+        for
+          wordList <- combinations(occ) if wordList.nonEmpty
+          meaningfulWord <- dictionaryByOccurrences.getOrElse(wordList, Nil)
+          rest <- sentenceAnagramsRecursive(subtract(occ, wordOccurrences(meaningfulWord)))
+        yield
+          meaningfulWord :: rest
+
+    sentenceAnagramsRecursive(sentenceOccurrences(sentence))
+
 
 object Dictionary:
   def loadDictionary: List[String] =
