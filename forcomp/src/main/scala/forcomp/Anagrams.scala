@@ -109,12 +109,8 @@ object Anagrams extends AnagramsInterface:
    */
   def subtract(x: Occurrences, y: Occurrences): Occurrences =
     y.foldLeft(x.toMap) { (newX, yCharFreq) =>
-      yCharFreq match {
-        case (yChar, yFreq) => newX.get(yChar) match
-          case Some(xFreq) => if xFreq - yFreq < 1 then newX - yChar else newX updated (yChar, xFreq - yFreq)
-          case None => newX
-      }
-    }.toList
+      newX updated (yCharFreq._1, newX.getOrElse(yCharFreq._1, yCharFreq._2) - yCharFreq._2)
+    }.filter((char, freq) => freq > 0).toList.sortBy(charFreq => charFreq._1)
 
 
 
